@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import { getRoleList, getUser, putUser } from '@/api/permission'
+import { getRoleSelects, postUser, getUser, putUser } from '@/api/permission'
 
 export default {
   data() {
@@ -38,18 +38,23 @@ export default {
       loading: false,
       roleList: null,
       userRoles: [],
-      form: {},
+      form: {
+        email: '',
+        name: ''
+      },
       userId: this.$route.params.id
     }
   },
   created() {
+    if (this.$route.params.id !== 'create') {
+      this.fetchUser()
+    }
     this.fetchRole()
-    this.fetchUser()
   },
   methods: {
     fetchRole() {
       this.loading = true
-      getRoleList().then(response => {
+      getRoleSelects().then(response => {
         const respData = response.data
         this.roleList = respData.roles
 
@@ -75,38 +80,50 @@ export default {
     },
     checkForm(scope) {
       this.$validator.validateAll(scope).then((result) => {
-        if (result) {
-          if (this.form.password === '') {
-            delete this.form.password
-            delete this.form.password_confirmation
-          }
+        if (!result) {
+          console.log('error submit!!')
+          return false
+        }
 
-          if (this.form.password !== this.form.password_confirmation) {
-            this.$swal({
-              type: 'error',
-              title: '兩次密碼輸入不一致',
-              showConfirmButton: false
-            })
-            return
-          }
+        if (this.form.password === '') {
+          delete this.form.password
+          delete this.form.password_confirmation
+        }
 
-          this.loading = true
+        if (this.form.password !== this.form.password_confirmation) {
+          this.$swal({
+            type: 'error',
+            title: '兩次密碼輸入不一致',
+            showConfirmButton: false
+          })
+          return
+        }
 
-          const resData = { user: Object.assign({}, this.form), role_ids: this.userRoles }
+        this.loading = true
 
-          putUser(this.userId, resData).then(response => {
+        const resData = { user: Object.assign({}, this.form), role_ids: this.userRoles }
+        if (this.$route.params.id === 'create') {
+          postUser(resData).then(response => {
             const respData = response.data
 
             this.loading = false
             if (respData === '') {
-              this.fetchUser()
+              this.$router.push({ name: 'PermissionUserList' })
             }
           }).catch(() => {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
-          return false
+          putUser(this.userId, resData).then(response => {
+            const respData = response.data
+
+            this.loading = false
+            if (respData === '') {
+              this.$router.push({ name: 'PermissionUserList' })
+            }
+          }).catch(() => {
+            this.loading = false
+          })
         }
       })
     }

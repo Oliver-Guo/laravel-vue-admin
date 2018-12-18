@@ -2,7 +2,7 @@
   <div class="app-container">
     <loading :active.sync="loading"></loading>
     <div class="filter-container text-right">
-      <router-link :to="{ name: 'PermissionRoleAdd'}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.PermissionRoleAdd">新增權限群組</el-button></router-link>
+      <router-link :to="{ name: 'PermissionRoleAdd', params: { id: 'create' }}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.PermissionRoleAdd">新增權限群組</el-button></router-link>
     </div>
     <el-table :data="list" row-key="id" element-loading-text="Loading" border fit stripe highlight-current-row >
       <el-table-column align="center" label='ID' width="95">

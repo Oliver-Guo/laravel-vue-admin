@@ -54,9 +54,19 @@ export function putAuthor(id, query, file) {
   })
 }
 
-export function getAllAuthor() {
+export function putAuthorOnline(id, query) {
+  query._method = 'PUT'
+
   return request({
-    url: '/admin/author/all_list',
+    url: '/admin/author/ch_is_online/' + id,
+    method: 'post',
+    data: query
+  })
+}
+
+export function getAuthorSelects() {
+  return request({
+    url: '/admin/author/selects',
     method: 'get'
   })
 }

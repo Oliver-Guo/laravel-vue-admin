@@ -54,17 +54,17 @@ export const constantRouterMap = [
         hidden: false
       },
       {
-        path: 'add',
-        name: 'AuthorAdd',
-        component: () => import('@/views/author/add'),
-        meta: { title: '新增作者' },
-        hidden: true
-      },
-      {
         path: 'edit/:id',
         name: 'AuthorEdit',
         component: () => import('@/views/author/edit'),
         meta: { title: '編輯作者' },
+        hidden: true
+      },
+      {
+        path: 'edit/:id',
+        name: 'AuthorAdd',
+        component: () => import('@/views/author/edit'),
+        meta: { title: '新增作者' },
         hidden: true
       }
     ]
@@ -93,17 +93,17 @@ export const constantRouterMap = [
         hidden: false
       },
       {
-        path: 'add',
-        name: 'TopicAdd',
-        component: () => import('@/views/topic/topicAdd'),
-        meta: { title: '新增專題' },
-        hidden: true
-      },
-      {
         path: 'edit/:id',
         name: 'TopicEdit',
         component: () => import('@/views/topic/topicEdit'),
         meta: { title: '編輯專題' },
+        hidden: true
+      },
+      {
+        path: 'edit/:id',
+        name: 'TopicAdd',
+        component: () => import('@/views/topic/topicEdit'),
+        meta: { title: '新增專題' },
         hidden: true
       }
     ]
@@ -124,17 +124,17 @@ export const constantRouterMap = [
         hidden: false
       },
       {
-        path: 'role/add',
-        name: 'PermissionRoleAdd',
-        component: () => import('@/views/permission/roleAdd'),
-        meta: { title: '新增權限群組' },
-        hidden: true
-      },
-      {
         path: 'role/edit/:id',
         name: 'PermissionRoleEdit',
         component: () => import('@/views/permission/roleEdit'),
         meta: { title: '編輯權限群組' },
+        hidden: true
+      },
+      {
+        path: 'role/edit/:id',
+        name: 'PermissionRoleAdd',
+        component: () => import('@/views/permission/roleEdit'),
+        meta: { title: '新增權限群組' },
         hidden: true
       },
       {
@@ -145,17 +145,17 @@ export const constantRouterMap = [
         hidden: false
       },
       {
-        path: 'user/add',
-        name: 'PermissionUserAdd',
-        component: () => import('@/views/permission/userAdd'),
-        meta: { title: '新增使用者' },
-        hidden: true
-      },
-      {
         path: 'user/edit/:id',
         name: 'PermissionUserEdit',
         component: () => import('@/views/permission/userEdit'),
         meta: { title: '編輯使用者' },
+        hidden: true
+      },
+      {
+        path: 'user/edit/:id',
+        name: 'PermissionUserAdd',
+        component: () => import('@/views/permission/userEdit'),
+        meta: { title: '新增使用者' },
         hidden: true
       }
     ]

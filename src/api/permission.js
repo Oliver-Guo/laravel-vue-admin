@@ -47,6 +47,13 @@ export function putRole(id, query) {
   })
 }
 
+export function getRoleSelects() {
+  return request({
+    url: '/admin/permission_role/selects',
+    method: 'get'
+  })
+}
+
 export function getUserList(query) {
   return request({
     url: '/admin/permission_user',

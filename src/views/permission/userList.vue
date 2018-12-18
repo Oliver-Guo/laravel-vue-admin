@@ -5,7 +5,7 @@
       <el-input @keyup.enter.native="funFilter" style="width: 200px;" class="filter-item" :placeholder="'使用者名稱'" v-model="listQuery.keyword">
       </el-input>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="funFilter">search</el-button>
-      <router-link :to="{ name: 'PermissionUserAdd'}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.PermissionUserAdd">新增使用者</el-button></router-link>
+      <router-link :to="{ name: 'PermissionUserAdd', params: { id: 'create' }}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.PermissionUserAdd">新增使用者</el-button></router-link>
     </div>
     <el-table :data="list" row-key="id" element-loading-text="Loading" border fit stripe highlight-current-row >
       <el-table-column align="center" label='ID' width="95">
@@ -115,6 +115,8 @@ export default {
           delUser(id).then(response => {
             this.loading = false
             this.fetchList()
+          }).catch(() => {
+            this.loading = false
           })
         }
       })

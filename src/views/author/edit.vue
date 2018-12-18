@@ -51,20 +51,29 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" style="width:10%;" @click.native.prevent="checkForm('form-1','draft')">儲存</el-button>
+        <el-button type="primary" style="width:10%;" @click.native.prevent="checkForm('form-1')">儲存</el-button>
       </el-form-item>
     </el-form>
   </div>
 </template>
 <script>
-import { getAuthor, putAuthor } from '@/api/author'
+import { postAuthor, getAuthor, putAuthor } from '@/api/author'
 import FileUpload from 'vue-upload-component'
 export default {
   data() {
     return {
       loading: false,
       authorId: this.$route.params.id,
-      form: {},
+      form: {
+        name: '',
+        is_online: false,
+        resource: '',
+        outsite_url: '',
+        fb_share: '',
+        google_share: '',
+        twitter_share: '',
+        description: ''
+      },
       files: [],
       image: ''
     }
@@ -73,7 +82,9 @@ export default {
     FileUpload
   },
   created() {
-    this.fetchAuthor()
+    if (this.$route.params.id !== 'create') {
+      this.fetchAuthor()
+    }
   },
   methods: {
     fetchAuthor() {
@@ -93,31 +104,45 @@ export default {
         this.loading = false
       })
     },
-    checkForm(scope, type) {
+    checkForm(scope) {
       this.$validator.validateAll(scope).then((result) => {
-        if (result) {
-          this.loading = true
+        if (!result) {
+          console.log('error submit!!')
+          return false
+        }
 
-          delete this.form.photo
+        this.loading = true
 
-          const resData = { author: Object.assign({}, this.form) }
-          resData.author.is_online = (resData.author.is_online) ? 1 : 0
+        delete this.form.photo
 
-          const resFile = (this.files[0]) ? this.files[0].file : false
+        const resData = { author: Object.assign({}, this.form) }
+        resData.author.is_online = (resData.author.is_online) ? 1 : 0
 
-          putAuthor(this.authorId, resData, resFile).then(response => {
+        const resFile = (this.files[0]) ? this.files[0].file : false
+
+        if (this.$route.params.id === 'create') {
+          postAuthor(resData, resFile).then(response => {
             const respData = response.data
+
             this.loading = false
             if (respData === '') {
-              this.fetchAuthor()
-              this.files = []
+              this.$router.push({ name: 'AuthorList' })
             }
           }).catch(() => {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
-          return false
+          putAuthor(this.authorId, resData, resFile).then(response => {
+            const respData = response.data
+            this.loading = false
+            if (respData === '') {
+              this.$router.push({ name: 'AuthorList' })
+              // this.fetchAuthor()
+              // this.files = []
+            }
+          }).catch(() => {
+            this.loading = false
+          })
         }
       })
     },

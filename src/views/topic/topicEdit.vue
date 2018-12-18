@@ -105,10 +105,10 @@
   </div>
 </template>
 <script>
-import { getTopicCategoryList, getTopic, putTopic } from '@/api/topic'
+import { getTopicCategoryList, postTopic, getTopic, putTopic } from '@/api/topic'
 import { getRsSearchTag } from '@/api/tag'
 import { getRsSearchArticle } from '@/api/article'
-import { getAllAuthor } from '@/api/author'
+import { getAuthorSelects } from '@/api/author'
 import FileUpload from 'vue-upload-component'
 import VueTagsInput from '@johmun/vue-tags-input'
 export default {
@@ -137,9 +137,11 @@ export default {
     'tag': 'fetchRsSearchTag'
   },
   created() {
+    if (this.$route.params.id !== 'create') {
+      this.fetchTopic()
+    }
     this.fetchTopicCategoryList()
     this.fetchAuthorList()
-    this.fetchTopic()
   },
   computed: {
     articleIds() {
@@ -159,11 +161,11 @@ export default {
 
         this.form.is_online = !!(respData.topic.is_online)
 
-        this.articles = this.form.article.map(item => {
+        this.articles = this.form.articles.map(item => {
           return { 'id': item.id, 'title': item.title }
         })
 
-        this.tags = this.form.tag.map(item => {
+        this.tags = this.form.tags.map(item => {
           return { 'text': item.name, 'tiClasses': ['valid'] }
         })
 
@@ -188,7 +190,7 @@ export default {
     },
     fetchAuthorList() {
       this.loading = true
-      getAllAuthor().then(response => {
+      getAuthorSelects().then(response => {
         const respData = response.data
         this.authors = respData.authors
         this.loading = false
@@ -205,6 +207,7 @@ export default {
       clearTimeout(this.debounce)
       this.debounce = setTimeout(() => {
         if (this.tag.length === 0) return
+
         getRsSearchTag(this.tag).then(response => {
           const respData = response.data
 
@@ -247,21 +250,26 @@ export default {
     },
     checkForm(scope) {
       this.$validator.validateAll(scope).then((result) => {
-        if (result) {
-          this.loading = true
+        if (!result) {
+          console.log('error submit!!')
+          return false
+        }
 
-          const resData = { topic: Object.assign({}, this.form) }
-          resData.topic.is_online = (resData.topic.is_online) ? 1 : 0
+        this.loading = true
 
-          const resFile = (this.files[0]) ? this.files[0].file : false
+        const resData = { topic: Object.assign({}, this.form) }
+        resData.topic.is_online = (resData.topic.is_online) ? 1 : 0
 
-          resData.tag_names = this.tags.map(item => {
-            return item.text
-          })
+        const resFile = (this.files[0]) ? this.files[0].file : false
 
-          resData.article_ids = this.articleIds
+        resData.tag_names = this.tags.map(item => {
+          return item.text
+        })
 
-          putTopic(this.topicId, resData, resFile).then(response => {
+        resData.article_ids = this.articleIds
+
+        if (this.$route.params.id === 'create') {
+          postTopic(resData, resFile).then(response => {
             const respData = response.data
 
             this.loading = false
@@ -272,8 +280,16 @@ export default {
             this.loading = false
           })
         } else {
-          console.log('error submit!!')
-          return false
+          putTopic(this.topicId, resData, resFile).then(response => {
+            const respData = response.data
+
+            this.loading = false
+            if (respData === '') {
+              this.$router.push({ name: 'TopicList' })
+            }
+          }).catch(() => {
+            this.loading = false
+          })
         }
       })
     },
@@ -296,6 +312,7 @@ export default {
     removeImage: function() {
       this.image = ''
       this.files = []
+      this.form.del_photo = true
     }
   }
 }

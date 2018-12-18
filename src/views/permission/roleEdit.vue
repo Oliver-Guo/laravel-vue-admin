@@ -36,7 +36,7 @@
   </div>
 </template>
 <script>
-import { getRolePermissions, getRole, putRole } from '@/api/permission'
+import { getRolePermissions, postRole, getRole, putRole } from '@/api/permission'
 
 export default {
   data() {
@@ -44,13 +44,18 @@ export default {
       loading: false,
       permissonList: null,
       rolePermissions: [],
-      form: {},
+      form: {
+        display_name: '',
+        name: ''
+      },
       roleId: this.$route.params.id
     }
   },
   created() {
+    if (this.$route.params.id !== 'create') {
+      this.fetchRole()
+    }
     this.fetchRolePermissions()
-    this.fetchRole()
   },
   methods: {
     fetchRolePermissions() {
@@ -81,25 +86,38 @@ export default {
     },
     checkForm(scope) {
       this.$validator.validateAll(scope).then((result) => {
-        if (result) {
-          this.loading = true
+        if (!result) {
+          console.log('error submit!!')
+          return false
+        }
 
-          const resData = { role: Object.assign({}, this.form), permission_ids: this.rolePermissions }
+        this.loading = true
 
+        const resData = { role: Object.assign({}, this.form), permission_ids: this.rolePermissions }
+
+        if (this.$route.params.id === 'create') {
+          postRole(resData).then(response => {
+            const respData = response.data
+
+            this.loading = false
+            if (respData === '') {
+              this.$router.push({ name: 'Permission' })
+            }
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
           putRole(this.roleId, resData).then(response => {
             const respData = response.data
 
             this.loading = false
 
             if (respData === '') {
-              this.fetchRole()
+              this.$router.push({ name: 'Permission' })
             }
           }).catch(() => {
             this.loading = false
           })
-        } else {
-          console.log('error submit!!')
-          return false
         }
       })
     }

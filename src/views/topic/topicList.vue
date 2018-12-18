@@ -5,7 +5,7 @@
       <el-input @keyup.enter.native="funFilter" style="width: 200px;" class="filter-item" :placeholder="'專題名稱'" v-model="listQuery.keyword">
       </el-input>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="funFilter">search</el-button>
-      <router-link :to="{ name: 'TopicAdd'}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.TopicAdd">新增專題</el-button></router-link>
+      <router-link :to="{ name: 'TopicAdd', params: { id: 'create' }}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.TopicAdd">新增專題</el-button></router-link>
     </div>
     <el-table :data="list" row-key="id" element-loading-text="Loading" border fit stripe highlight-current-row >
       <el-table-column align="center" label='ID' width="95">
@@ -20,17 +20,17 @@
       </el-table-column>
       <el-table-column label="專題分類">
         <template slot-scope="scope">
-          {{scope.row.topic_category.name}}
+          {{scope.row.topic_category ? scope.row.topic_category.name : ''}}
         </template>
       </el-table-column>
       <el-table-column label="作者">
         <template slot-scope="scope">
-          {{scope.row.author.name}}
+          {{scope.row.author ? scope.row.author.name : ''}}
         </template>
       </el-table-column>
       <el-table-column label="標籤">
         <template slot-scope="scope">
-          <div v-for="tag in scope.row.tag" :key="tag.id">
+          <div v-for="tag in scope.row.tags" :key="tag.id">
             <span>{{tag.name}}</span>
           </div>
         </template>

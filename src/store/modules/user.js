@@ -45,7 +45,7 @@ const user = {
         getInfo(state.token).then(response => {
           const data = response.data
           commit('SET_NAME', data.name)
-          commit('SET_AUTHS', data.auths)
+          commit('SET_AUTHS', data.permissions)
           resolve(response)
         }).catch(error => {
           reject(error)

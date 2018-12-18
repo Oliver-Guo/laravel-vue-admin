@@ -5,7 +5,7 @@
       <el-input @keyup.enter.native="funFilter" style="width: 200px;" class="filter-item" :placeholder="'作者名稱'" v-model="listQuery.keyword">
       </el-input>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="funFilter">search</el-button>
-      <router-link :to="{ name: 'AuthorAdd'}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.AuthorAdd">新增作者</el-button></router-link>
+      <router-link :to="{ name: 'AuthorAdd', params: { id: 'create' }}"><el-button type="info" icon="el-icon-circle-plus" v-if="auths.AuthorAdd">新增作者</el-button></router-link>
     </div>
     <el-table :data="list" row-key="id" element-loading-text="Loading" border fit stripe highlight-current-row >
       <el-table-column align="center" label='ID' width="95">
@@ -18,14 +18,14 @@
           {{scope.row.name}}
         </template>
       </el-table-column>
-      <el-table-column label="文章篇數" width="110" align="center">
+      <el-table-column label="啟用關閉" width="80">
         <template slot-scope="scope">
-          <span>{{scope.row.article_count}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="狀態" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.is_online | statusTagFilter">{{ scope.row.is_online===1 ? '啟用' : '關閉'}}</el-tag>
+        <el-switch
+          v-model="isOnlines[scope.$index]"
+          @change="funOnline(scope.row.id,scope.$index)"
+          active-color="#13ce66"
+          inactive-color="#ff4949">
+        </el-switch>
         </template>
       </el-table-column>
       <el-table-column label="圖片" width="180" align="center">
@@ -60,15 +60,16 @@
 </template>
 
 <script>
-import { getList, delAuthor } from '@/api/author'
+import { getList, delAuthor, putAuthorOnline } from '@/api/author'
 import $ from 'jquery'
 export default {
   data() {
     return {
       loading: false,
       list: null,
-      listQuery: { page: 1 },
-      listTotal: null
+      listQuery: { page: 1, paginate: 10 },
+      listTotal: null,
+      isOnlines: []
     }
   },
   filters: {
@@ -99,6 +100,11 @@ export default {
         this.listQuery.paginate = parseInt(respData.per_page)
 
         this.listTotal = respData.total
+
+        this.isOnlines = []
+        Object.keys(this.list).map(key => {
+          this.isOnlines.push((this.list[key].is_online === 1))
+        })
 
         this.loading = false
 
@@ -139,6 +145,11 @@ export default {
           })
         }
       })
+    },
+    funOnline(id, index) {
+      const resData = { is_online: (this.isOnlines[index]) ? 1 : 0 }
+      this.list[index].is_online = resData.is_online
+      putAuthorOnline(id, resData)
     }
   }
 }
